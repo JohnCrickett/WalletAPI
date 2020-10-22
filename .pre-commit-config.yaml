@@ -1,0 +1,14 @@
+repos:
+- repo: local
+  hooks:
+    - id: black
+      name: Black format files
+      entry: black
+      language: system
+      files: \.py$
+    - id: mypy
+      name: Static analysis
+      entry: mypy wallet_api
+      language: system
+      pass_filenames: false
+

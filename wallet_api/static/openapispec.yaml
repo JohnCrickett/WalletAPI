@@ -1,0 +1,122 @@
+openapi: 3.0.0
+servers:
+  - url: /wallet
+info:
+  description: This is the Wallet API
+  version: "1.0.0"
+  title: Wallet API
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+security:
+  - basicAuth: []
+paths:
+  /balance:
+    get:
+      tags:
+        - balance
+      summary: Gets the user's balance
+      description: |
+        Retrieves the currently authenticated user's current balance
+      responses:
+        '200':
+          description: The balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balance'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /transactions:
+    get:
+      tags:
+        - transactions
+      summary: Gets the user's transaction
+      description: |
+        Retrieves the currently authenticated user's list of transactions
+      responses:
+        '200':
+          description: Transaction list, including those of which the user is either sender or receiver.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /transfer:
+    post:
+      tags:
+        - transfer
+      summary: Transfers Funds
+      description: |
+        Transfers funds from the currently authenticated user to another user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+      responses:
+        '200':
+          description: Outcome of tansfer.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    Balance:
+      type: object
+      required:
+        - balance
+      properties:
+        balance:
+          type: integer
+    Transaction:
+      type: object
+      required:
+        - sender
+        - receiver
+        - date
+        - amount
+      properties:
+        sender:
+          type: string
+        receiver:
+          type: string
+        date:
+          type: string
+        amount:
+          type: integer
+    Transfer:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: string
+    TransferRequest:
+      type: object
+      required:
+        - receiver
+        - amount
+      properties:
+        receiver:
+          type: string
+        amount:
+          type: integer
+  responses:
+    UnauthorizedError:
+      description: Authentication information is missing or invalid
+      headers:
+        WWW_Authenticate:
+          schema:
+            type: string
