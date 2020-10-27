@@ -29,6 +29,7 @@ def close_db(e=None):
 
 
 def init_db():
+    """Initialise the database schema."""
     db = get_db()
 
     with current_app.open_resource("schema.sql") as f:
@@ -39,11 +40,11 @@ def init_db():
 @with_appcontext
 def init_db_command():
     """Clear the existing data and create new tables."""
-    init_db()
     click.echo("Initializing the database.")
+    init_db()
 
 
 def init_app(app: Flask):
-    """Initialise the application and register teardown handler"""
+    """Initialise the application and register teardown handler."""
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)

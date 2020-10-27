@@ -8,6 +8,7 @@ to be addressed before it could be used in a production system:
  - Uses SQLite as the backend database, this won't scale.
  - HTTP Basic Authentication, adequate to demonstrate how the API can be authenticated
    but not secure, especially so if not run over HTTPS!
+ - Ideally a production system would lock a user account after a number of failed access attempts.
  - Ideally the database operations would be abstracted away, possibly through an
    ORM layer such as SQLAlchemy. This would make it easier to switch back end 
    database engines and servers. 

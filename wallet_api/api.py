@@ -30,8 +30,10 @@ def verify_password(username: str, password: str) -> bool:
     db = get_db()
     sql = "SELECT id, password FROM users WHERE username = ?"
     result = db.execute(sql, (username,)).fetchone()
+
     if result is not None:
         g.user = result["id"]
+
         if check_password_hash(result["password"], password):
             return True
 

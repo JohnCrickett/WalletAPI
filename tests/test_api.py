@@ -3,22 +3,23 @@ from base64 import b64encode
 
 def _make_headers(username, password):
     credentials = b64encode(f"{username}:{password}".encode()).decode()
-    return {"Authorization": "Basic {}".format(credentials)}
+    return {"Authorization": f"Basic {credentials}"}
 
 
 def test_balance_invalid_user(client):
-    user_credentials = b64encode(b"invalid_user:password").decode()
-    headers = {"Authorization": "Basic {}".format(user_credentials)}
-
-    response = client.get("/wallet/balance", headers=headers)
+    response = client.get(
+        "/wallet/balance", headers=_make_headers("invalid_user", "password")
+    )
     assert response.status_code == 401
 
 
 def test_balance_invalid_password(client):
-    user_credentials = b64encode(b"user1:invalid_password").decode()
-    headers = {"Authorization": "Basic {}".format(user_credentials)}
+    # user_credentials = b64encode(b"user1:invalid_password").decode()
+    # headers = {"Authorization": "Basic {}".format(user_credentials)}
 
-    response = client.get("/wallet/balance", headers=headers)
+    response = client.get(
+        "/wallet/balance", headers=_make_headers("user1", "invalid_password")
+    )
     assert response.status_code == 401
 
 
