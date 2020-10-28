@@ -3,7 +3,6 @@ from typing import Optional, Tuple
 from flask import Blueprint, current_app, g, jsonify, Response, request
 from flask_httpauth import HTTPBasicAuth
 import sqlite3
-from werkzeug.exceptions import BadRequest
 from werkzeug.security import check_password_hash
 
 from wallet_api.db import get_db
