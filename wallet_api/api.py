@@ -56,12 +56,23 @@ def transfer() -> Tuple[dict, Optional[int]]:
     The sender is the currently authenticated user.
     """
     if request.json.keys() < {"amount", "receiver"}:
-        raise BadRequest(
-            "Invalid request, please provide both receiver and amount"
+        return (
+            jsonify(
+                error="Invalid request, please provide both receiver and amount"
+            ),
+            400,
         )
 
     receiver_username = request.json["receiver"]
     amount = request.json["amount"]
+
+    if not type(amount) is int:
+        return (
+            jsonify(
+                error="Invalid amount provided, please ensure the correct type is used."
+            ),
+            400,
+        )
 
     db = get_db()
     sql = "SELECT id FROM users WHERE username = ?"

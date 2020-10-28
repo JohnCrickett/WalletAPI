@@ -14,9 +14,6 @@ def test_balance_invalid_user(client):
 
 
 def test_balance_invalid_password(client):
-    # user_credentials = b64encode(b"user1:invalid_password").decode()
-    # headers = {"Authorization": "Basic {}".format(user_credentials)}
-
     response = client.get(
         "/wallet/balance", headers=_make_headers("user1", "invalid_password")
     )
@@ -43,6 +40,20 @@ def test_transfer_valid_invalid_receiver(client):
     assert response.status_code == 400
     error = response.json["error"]
     assert error == "Invalid User Provided"
+
+
+def test_transfer_invalid_type(client):
+    response = client.post(
+        "/wallet/transfer",
+        json={"receiver": "user5", "amount": "50"},
+        headers=_make_headers("user4", "itsasecret"),
+    )
+    assert response.status_code == 400
+    error = response.json["error"]
+    assert (
+        error
+        == "Invalid amount provided, please ensure the correct type is used."
+    )
 
 
 def test_transfer_insufficient_funds(client):
