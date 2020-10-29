@@ -18,4 +18,13 @@ ENV FLASK_APP /app/wallet_api
 RUN flask init-db && \
     python /app/tools/adduser.py --database /app/instance/wallet.sqlite --username john --password test --balance 100
 
-CMD gunicorn --bind=0.0.0.0:5000 --access-logfile '-' wallet_api.gunicorn-entry:app
+ENV PORT 5000
+ENV NUM_WORKERS 4
+ENV WORKER_CLASS sync
+
+CMD gunicorn \
+    --bind=0.0.0.0:$PORT \
+    --access-logfile '-' \
+    --workers=$NUM_WORKERS \
+    --worker-class=$WORKER_CLASS \
+    wallet_api.gunicorn-entry:app
