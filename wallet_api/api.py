@@ -54,6 +54,7 @@ def transfer() -> Tuple[dict, Optional[int]]:
 
     The sender is the currently authenticated user.
     """
+
     if request.json.keys() < {"amount", "receiver"}:
         return (
             jsonify(
@@ -71,6 +72,12 @@ def transfer() -> Tuple[dict, Optional[int]]:
                 error="Invalid amount provided, please ensure the correct type is used."
             ),
             400,
+        )
+
+    if amount <= 0:
+        return (
+            jsonify(error="Transfer amount must be greater than zero."),
+            403,
         )
 
     db = get_db()

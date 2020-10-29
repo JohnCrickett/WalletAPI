@@ -1,5 +1,7 @@
 from base64 import b64encode
 
+import pytest
+
 
 def _make_headers(username, password):
     credentials = b64encode(f"{username}:{password}".encode()).decode()
@@ -75,6 +77,47 @@ def test_transfer_insufficient_funds(client):
     assert response.status_code == 200
     assert "balance" in response.json
     assert response.json["balance"] == 0
+
+
+@pytest.mark.parametrize("amount", [0, -50])
+def test_transfer_invalid_amount(client, amount):
+    response = client.post(
+        "/wallet/transfer",
+        json={"receiver": "user4", "amount": amount},
+        headers=_make_headers("user2", "realsecret"),
+    )
+
+    # Verify transfer not permitted
+    assert response.status_code == 403
+    error = response.json["error"]
+    assert error == "Transfer amount must be greater than zero."
+
+    # Verify no change to receiver's balance
+    response = client.get(
+        "/wallet/balance", headers=_make_headers("user4", "itsasecret")
+    )
+    assert response.status_code == 200
+    assert "balance" in response.json
+    assert response.json["balance"] == 500
+
+    # Verify no change to sender's balance
+    response = client.get(
+        "/wallet/balance", headers=_make_headers("user2", "realsecret")
+    )
+    assert response.status_code == 200
+    assert "balance" in response.json
+    assert response.json["balance"] == 500
+
+    # Verify no transaction has been recorded
+    response = client.get(
+        "/wallet/transactions", headers=_make_headers("user2", "realsecret")
+    )
+    assert response.status_code == 200
+    transactions = response.json["transactions"]
+    assert len(transactions) == 1
+    assert transactions[0]["sender"] != "user2"
+    assert transactions[0]["receiver"] != "user4"
+    assert transactions[0]["amount"] != -50
 
 
 def test_transfer_valid(client):

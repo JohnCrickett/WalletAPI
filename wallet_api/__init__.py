@@ -12,7 +12,7 @@ def create_app(test_config: Union[dict, None] = None) -> Flask:
     """Create the Flask application"""
     app = Flask(__name__, instance_relative_config=True)
     database_path = join(app.instance_path, "wallet.sqlite")
-    app.config.from_mapping(SECRET_KEY="S3CR3T", DATABASE=database_path)
+    app.config.from_mapping(DATABASE=database_path)
 
     if test_config is None:
         app.config.from_pyfile("config.py", silent=True)
